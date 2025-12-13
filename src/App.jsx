@@ -1,12 +1,15 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import { useEffect, useState } from "react";
 import "./App.css";
 
 const Card = ({ title }) => {
-  const [hasLiked, setHasLiked] = useState(true)
+  const [count, setCount] = useState(0);
+  const [hasLiked, setHasLiked] = useState(false);
+  useEffect(() => {
+    console.log({ title }, "been been" + { hasLiked });
+  }, [hasLiked]);
+
   return (
-    <div>
+    <div onClick={() => setCount(count + 1)}>
       <h2
         style={{
           backgroundColor: "skyblue",
@@ -17,28 +20,32 @@ const Card = ({ title }) => {
         }}
       >
         {title}
+        <br />
+        {count ? count : null}
       </h2>
-      <button onClick={()=>setHasLiked(!hasLiked)
-      } style={{
-        position:'relative',
-        top:'-50px',
-        right:'-50px',
-        size:'10px', 
-        border:'0px',
-        margin:'0px',
-        padding:'0px',  
-        backgroundColor:'#00ff'      
-      }}
+      <button
+        onClick={() => setHasLiked(!hasLiked)}
+        style={{
+          position: "relative",
+          top: "-50px",
+          right: "-50px",
+          size: "10px",
+          border: "0px",
+          margin: "0px",
+          padding: "0px",
+          backgroundColor: "#00ff",
+        }}
       >
-        {hasLiked ? '❤' : '🧡' }
+        {hasLiked ? "🧡" : "❤"}
       </button>
     </div>
   );
 };
 const App = () => {
-  console.log('heyy')
+  console.log("heyy");
   return (
     <>
+      <div class="text-6xl font-bold underline text-amber-950">Hello world!</div>
       <Card title="Isah" />
       <Card title="Slow" />
       <Card title="Solomon" />
