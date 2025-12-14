@@ -45,7 +45,7 @@ const App = () => {
   console.log("heyy");
   return (
     <>
-      <div class="text-6xl font-bold underline text-amber-950">Hello world!</div>
+      <header class="text-6xl font-bold underline text-amber-950">Hello world!</header>
       <Card title="Isah" />
       <Card title="Slow" />
       <Card title="Solomon" />
