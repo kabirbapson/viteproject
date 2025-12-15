@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import Search from "./components/Search";
+import MovieCard from "./components/MovieCard";
 
 const Card = ({ title }) => {
   const [count, setCount] = useState(0);
@@ -44,11 +45,11 @@ const Card = ({ title }) => {
 };
 const App = () => {
   const [searchTerm, setSearchTerm] = useState();
-  const [errorMessage, setErrorMessage] = useState('All Me');
+  const [errorMessage, setErrorMessage] = useState("");
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const VITE_TMDB_API_KEY="eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkMjRjY2NjZjYzMTc5YjA0NzFiYjY0YzA0ODYyMDI3OSIsIm5iZiI6MTc2NTcxNzg0NS41NTksInN1YiI6IjY5M2ViNzU1ZGQyYjdjY2U3YTk5OTgwZiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.QjnWHvBtcfxL_FL0QjPd76fiaYCkjHnu2g4iWNSyoMc"
   const API_BASE_URL = "https://api.themoviedb.org/3/discover/movie";
-  
   const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
   const API_OPTION = {
     method: "GET",
@@ -58,24 +59,41 @@ const App = () => {
     },
   };
 
-  const fetchMovies = async () => {
+  const fetchMovies = async (query = "") => {
+    setLoading(true);
+    setErrorMessage("");
     try {
-      const response = await fetch(API_BASE_URL, API_OPTION);
-      const res = await response.json();
+      const trimmedQuery = query.trim();
+      const endPoint = trimmedQuery
+        ? `https://api.themoviedb.org/3/search/movie?query=${trimmedQuery}`
+        : `${API_BASE_URL}?sort_by=popularity.desc`;
 
-      console.log("dd", res);
+      //
+
+      // const endPoint = trimmedQuery
+      //   ? `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(
+      //       trimmedQuery
+
+      const response = await fetch(endPoint, API_OPTION);
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.status_message || "request failed");
+      }
+      setMovies(data.results);
+      setLoading(false);
+      console.log({ data });
     } catch (error) {
-      setErrorMessage("Error found", errorMessage);
-      console.log(error.status_message);
-      setErrorMessage(error.status_message)
+      console.log(error);
+      setErrorMessage(error.message);
+      setLoading(false);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchMovies();
-
-    console.log("dggdgd");
-  }, []);
+    fetchMovies(searchTerm);
+  }, [searchTerm]);
 
   return (
     <>
@@ -85,7 +103,23 @@ const App = () => {
       <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       <section>
         All Movies
-        { errorMessage}
+        {loading ? (
+          <div className="flex gap-2 justify-center py-10">
+            <span className="h-3 w-3 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]" />
+            <span className="h-3 w-3 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.15s]" />
+            <span className="h-3 w-3 bg-blue-600 rounded-full animate-bounce" />
+          </div>
+        ) : errorMessage ? (
+          <p className="text-red-600"> Fetch Error {errorMessage}</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3  lg:grid-cols-4 gap-6">
+            {movies?.map((movie) => (
+              <div key={movie.id} onClick={() => console.log(movie.title)}>
+                <MovieCard movie={movie} />
+              </div>
+            ))}
+          </div>
+        )}
       </section>
       <Card title="Isah" />
       <Card title="Slow" />
